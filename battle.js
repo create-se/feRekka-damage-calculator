@@ -5,7 +5,13 @@ let allBattleResults = [];
 document.addEventListener('DOMContentLoaded', function() {
     initializeSelects();
     loadUnitOptions();
-    loadWeaponOptions();
+    loadWeaponOptions(); // 初回は最初のユニットに合わせて武器を読み込む
+    
+    // ユニット変更時に武器リストを更新
+    document.getElementById('unit').addEventListener('change', updateWeaponOptions);
+    
+    // クラスチェンジ変更時に武器リストを更新
+    document.getElementById('class-change').addEventListener('change', updateWeaponOptions);
 });
 
 // プルダウン初期化
@@ -46,12 +52,50 @@ function loadUnitOptions() {
     });
 }
 
-// 武器オプション読み込み
+// 武器オプション読み込み（初回用）
 function loadWeaponOptions() {
+    updateWeaponOptions();
+}
+
+// 武器オプションを更新（ユニットのクラスに応じて）
+function updateWeaponOptions() {
+    const unitName = document.getElementById('unit').value;
+    const isClassChange = document.getElementById('class-change').checked;
     const weaponSelect = document.getElementById('weapon');
-    weapons.forEach(weapon => {
-        weaponSelect.innerHTML += `<option value="${weapon.name}">${weapon.name}</option>`;
-    });
+    
+    // 現在選択中の武器を保存
+    const currentWeapon = weaponSelect.value;
+    
+    // ユニットを取得
+    const unit = units.find(u => u.name === unitName);
+    if (!unit) {
+        // ユニットが見つからない場合は全武器を表示
+        weaponSelect.innerHTML = '';
+        weapons.forEach(weapon => {
+            weaponSelect.innerHTML += `<option value="${weapon.name}">${weapon.name}</option>`;
+        });
+        return;
+    }
+    
+    // クラスに応じた使用可能武器を取得
+    const availableWeapons = getAvailableWeapons(unit.class, isClassChange, unit.ccClass);
+    
+    // 武器リストを更新
+    weaponSelect.innerHTML = '';
+    
+    if (availableWeapons.length === 0) {
+        weaponSelect.innerHTML = '<option value="">（攻撃不可）</option>';
+    } else {
+        availableWeapons.forEach(weapon => {
+            weaponSelect.innerHTML += `<option value="${weapon.name}">${weapon.name}</option>`;
+        });
+    }
+    
+    // 以前選択していた武器が使用可能なら選択を維持
+    const canUseCurrentWeapon = availableWeapons.some(w => w.name === currentWeapon);
+    if (canUseCurrentWeapon) {
+        weaponSelect.value = currentWeapon;
+    }
 }
 
 // 期待値を表示
