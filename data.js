@@ -216,3 +216,92 @@ const unitClasses = [
     {className:'司祭',classRank:1,bonusHp:0,bonusPower:0,bonusSkill:0,bonusSpeed:0,bonusLuck:0,bonusDefence:0,bonusMagicDef:0,bonusBody:0,maxHp:60,maxPower:25,maxSkill:26,maxSpeed:24,maxLuck:30,maxDefence:22,maxMagicDef:30}
 ];
 
+// クラス別使用可能武器データ
+// weaponTypes: 使用可能な武器属性（剣、槍、斧、弓、理、光、闇）
+// specialWeapons: そのクラス専用の特殊武器名
+const classWeapons = {
+    // === 下級クラス ===
+    'ロード(e)': { weaponTypes: ['剣'], specialWeapons: ['レイピア', 'デュランダル'] },
+    'ロード(h)': { weaponTypes: ['斧'], specialWeapons: ['ヴォルフバイル', 'アルマーズ'] },
+    'ロード(l)': { weaponTypes: ['剣'], specialWeapons: ['マーニ・カティ', 'ソール・カティ'] },
+    '剣士': { weaponTypes: ['剣'], specialWeapons: [] },
+    '傭兵': { weaponTypes: ['剣'], specialWeapons: [] },
+    'ソシアルナイト': { weaponTypes: ['剣', '槍'], specialWeapons: [] },
+    'ペガサスナイト': { weaponTypes: ['槍'], specialWeapons: [] },
+    'ドラゴンナイト': { weaponTypes: ['槍'], specialWeapons: [] },
+    '海賊': { weaponTypes: ['斧'], specialWeapons: [] },
+    '戦士': { weaponTypes: ['斧'], specialWeapons: [] },
+    'アーマーナイト': { weaponTypes: ['槍'], specialWeapons: [] },
+    '盗賊': { weaponTypes: ['剣'], specialWeapons: [] },
+    'アーチャー(男)': { weaponTypes: ['弓'], specialWeapons: [] },
+    'アーチャー(女)': { weaponTypes: ['弓'], specialWeapons: [] },
+    '遊牧民': { weaponTypes: ['弓'], specialWeapons: [] },
+    'シスター': { weaponTypes: [], specialWeapons: [] }, // 杖のみ（攻撃不可）
+    'トルバドール': { weaponTypes: [], specialWeapons: [] }, // 杖のみ（攻撃不可）
+    '魔道士(男)': { weaponTypes: ['理'], specialWeapons: [] },
+    '魔道士(女)': { weaponTypes: ['理'], specialWeapons: [] },
+    '修道士': { weaponTypes: ['光'], specialWeapons: [] },
+    'シャーマン': { weaponTypes: ['闇'], specialWeapons: [] },
+
+    // === 上級クラス ===
+    'ロードナイト': { weaponTypes: ['剣', '槍'], specialWeapons: ['レイピア', 'デュランダル'] },
+    'グレートロード': { weaponTypes: ['斧', '剣'], specialWeapons: ['ヴォルフバイル', 'アルマーズ'] },
+    'ブレイドロード': { weaponTypes: ['剣', '弓'], specialWeapons: ['マーニ・カティ', 'ソール・カティ'] },
+    'ソードマスター(男)': { weaponTypes: ['剣'], specialWeapons: [] },
+    'ソードマスター(女)': { weaponTypes: ['剣'], specialWeapons: [] },
+    'ソードマスター': { weaponTypes: ['剣'], specialWeapons: [] },
+    '勇者': { weaponTypes: ['剣', '斧'], specialWeapons: [] },
+    'パラディン(男)': { weaponTypes: ['剣', '槍'], specialWeapons: [] },
+    'パラディン(女)': { weaponTypes: ['剣', '槍'], specialWeapons: [] },
+    'パラディン': { weaponTypes: ['剣', '槍'], specialWeapons: [] },
+    'ファルコンナイト': { weaponTypes: ['槍', '剣'], specialWeapons: [] },
+    'ドラゴンマスター(男)': { weaponTypes: ['槍', '斧'], specialWeapons: [] },
+    'ドラゴンマスター(女)': { weaponTypes: ['槍', '斧'], specialWeapons: [] },
+    '狂戦士': { weaponTypes: ['斧'], specialWeapons: [] },
+    'ウォーリアー': { weaponTypes: ['斧', '弓'], specialWeapons: [] },
+    'ジェネラル': { weaponTypes: ['槍', '斧'], specialWeapons: [] },
+    'アサシン': { weaponTypes: ['剣'], specialWeapons: [] },
+    'スナイパー': { weaponTypes: ['弓'], specialWeapons: [] },
+    '遊牧騎兵': { weaponTypes: ['弓', '剣'], specialWeapons: [] },
+    '司祭(男)': { weaponTypes: ['光'], specialWeapons: [] },
+    '司祭(女)': { weaponTypes: ['光'], specialWeapons: [] },
+    '司祭': { weaponTypes: ['光'], specialWeapons: [] },
+    'ヴァルキュリア': { weaponTypes: ['理'], specialWeapons: [] },
+    '賢者(男)': { weaponTypes: ['理', '光'], specialWeapons: [] },
+    '賢者(女)': { weaponTypes: ['理', '光'], specialWeapons: [] },
+    '賢者': { weaponTypes: ['理', '光'], specialWeapons: [] },
+    'ドルイド': { weaponTypes: ['闘', '光'], specialWeapons: [] },
+    '大賢者': { weaponTypes: ['理', '光', '闇'], specialWeapons: [] },
+    'バード/踊り子': { weaponTypes: [], specialWeapons: [] }, // 攻撃不可
+    '輸送隊': { weaponTypes: [], specialWeapons: [] } // 攻撃不可
+};
+
+// クラスに応じた使用可能武器を取得する関数
+function getAvailableWeapons(className, isClassChange, ccClassName) {
+    // クラスチェンジ後の場合はCC後のクラス名を使用
+    const targetClass = isClassChange && ccClassName ? ccClassName : className;
+    const classWeapon = classWeapons[targetClass];
+    
+    if (!classWeapon) {
+        console.warn(`クラス "${targetClass}" の武器データが見つかりません`);
+        return weapons; // 見つからない場合は全武器を返す
+    }
+    
+    // 使用可能な武器をフィルタリング
+    return weapons.filter(weapon => {
+        // 特殊武器の場合
+        if (classWeapon.specialWeapons.includes(weapon.name)) {
+            return true;
+        }
+        
+        // 他のクラスの専用武器は除外
+        const allSpecialWeapons = ['レイピア', 'デュランダル', 'ヴォルフバイル', 'アルマーズ', 'マーニ・カティ', 'ソール・カティ'];
+        if (allSpecialWeapons.includes(weapon.name) && !classWeapon.specialWeapons.includes(weapon.name)) {
+            return false;
+        }
+        
+        // 武器属性がクラスの使用可能タイプに含まれるか
+        return classWeapon.weaponTypes.includes(weapon.attribute);
+    });
+}
+
