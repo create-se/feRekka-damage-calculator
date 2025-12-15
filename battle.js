@@ -110,30 +110,35 @@ function displayExpectedValues() {
     const unitClass = unitClasses.find(c => c.className === unit.class);
     if (!unitClass) return;
     
+    // クラスチェンジ後のクラス情報を取得（上限値用）
+    const targetClassName = (isClassChange && unit.class !== unit.ccClass) ? unit.ccClass : unit.class;
+    const targetClass = unitClasses.find(c => c.className === targetClassName);
+    if (!targetClass) return;
+    
     const upLevel = level - unit.level;
     const upLevelCC = level - unit.level + 19;
     
     let expected;
     if (isClassChange && unit.class !== unit.ccClass) {
         expected = {
-            hp: unit.hp + Math.floor(upLevelCC * unit.hpGrowth) + unitClass.bonusHp,
-            power: unit.power + Math.floor(upLevelCC * unit.powerGrowth) + unitClass.bonusPower,
-            skill: unit.skill + Math.floor(upLevelCC * unit.skillGrowth) + unitClass.bonusSkill,
-            speed: unit.speed + Math.floor(upLevelCC * unit.speedGrowth) + unitClass.bonusSpeed,
-            luck: unit.luck + Math.floor(upLevelCC * unit.luckGrowth) + unitClass.bonusLuck,
-            defense: unit.defense + Math.floor(upLevelCC * unit.defenseGrowth) + unitClass.bonusDefence,
-            magicDef: unit.magicDef + Math.floor(upLevelCC * unit.magicDefGrowth) + unitClass.bonusMagicDef,
+            hp: Math.min(unit.hp + Math.floor(upLevelCC * unit.hpGrowth) + unitClass.bonusHp, targetClass.maxHp),
+            power: Math.min(unit.power + Math.floor(upLevelCC * unit.powerGrowth) + unitClass.bonusPower, targetClass.maxPower),
+            skill: Math.min(unit.skill + Math.floor(upLevelCC * unit.skillGrowth) + unitClass.bonusSkill, targetClass.maxSkill),
+            speed: Math.min(unit.speed + Math.floor(upLevelCC * unit.speedGrowth) + unitClass.bonusSpeed, targetClass.maxSpeed),
+            luck: Math.min(unit.luck + Math.floor(upLevelCC * unit.luckGrowth) + unitClass.bonusLuck, targetClass.maxLuck),
+            defense: Math.min(unit.defense + Math.floor(upLevelCC * unit.defenseGrowth) + unitClass.bonusDefence, targetClass.maxDefence),
+            magicDef: Math.min(unit.magicDef + Math.floor(upLevelCC * unit.magicDefGrowth) + unitClass.bonusMagicDef, targetClass.maxMagicDef),
             body: unit.body + unitClass.bonusBody
         };
     } else {
         expected = {
-            hp: unit.hp + Math.floor(upLevel * unit.hpGrowth),
-            power: unit.power + Math.floor(upLevel * unit.powerGrowth),
-            skill: unit.skill + Math.floor(upLevel * unit.skillGrowth),
-            speed: unit.speed + Math.floor(upLevel * unit.speedGrowth),
-            luck: unit.luck + Math.floor(upLevel * unit.luckGrowth),
-            defense: unit.defense + Math.floor(upLevel * unit.defenseGrowth),
-            magicDef: unit.magicDef + Math.floor(upLevel * unit.magicDefGrowth),
+            hp: Math.min(unit.hp + Math.floor(upLevel * unit.hpGrowth), targetClass.maxHp),
+            power: Math.min(unit.power + Math.floor(upLevel * unit.powerGrowth), targetClass.maxPower),
+            skill: Math.min(unit.skill + Math.floor(upLevel * unit.skillGrowth), targetClass.maxSkill),
+            speed: Math.min(unit.speed + Math.floor(upLevel * unit.speedGrowth), targetClass.maxSpeed),
+            luck: Math.min(unit.luck + Math.floor(upLevel * unit.luckGrowth), targetClass.maxLuck),
+            defense: Math.min(unit.defense + Math.floor(upLevel * unit.defenseGrowth), targetClass.maxDefence),
+            magicDef: Math.min(unit.magicDef + Math.floor(upLevel * unit.magicDefGrowth), targetClass.maxMagicDef),
             body: unit.body
         };
     }
